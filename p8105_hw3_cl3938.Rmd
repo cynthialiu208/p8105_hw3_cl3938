@@ -8,6 +8,8 @@ output: github_document
 library(tidyverse)
 library(p8105.datasets)
 library(dplyr)
+library(ggridges)
+library(patchwork)
 
 knitr::opts_chunk$set(
 	fig.width = 6, 
@@ -93,9 +95,13 @@ instacart %>%
 accel = 
   read_csv("./data/accel_data.csv") %>%
   janitor::clean_names() %>%
-  mutate( day_type = ifelse(day %in% c("Saturday", "Sunday"), "Weekend", "Weekday" )) %>%
-  relocate(day_type, .after = day) %>%
-  
+  pivot_longer(cols = starts_with('activity'), names_to = 'minute', names_prefix = "activity.", values_to = 'activity') %>%
+  mutate(
+    minute = as.numeric(minute),
+    day = as.factor(day),
+    activity = as.numeric(activity),
+    day_type = ifelse(day %in% c("Saturday", "Sunday"), "Weekend", "Weekday" )) %>%
+  relocate(day_type, .after = day)
 ```
 
 This dataset contains `r nrow(accel)` observations and `r ncol(accel)` variables. 
@@ -106,10 +112,9 @@ Observations are at the level of daily activity of the patient, with data organi
 
 ``` {r}
 accel %>% 
-	mutate(rank = min_rank(desc(n))) %>% 
-	filter(rank < 4) %>% 
-	arrange(aisle, rank) %>% 
-	knitr::kable()
+  group_by(week, day_id, day) %>%
+  summarize(total_activity = sum(activity)) %>%
+	knitr::kable(caption = 'Total Activity per Day')
 ```
 
 #Question 3
@@ -148,28 +153,62 @@ months.labs <- c("January", "July")
 names(months.labs) <- as.numeric(c("1", "7"))
 
 noaa_df %>%
-  group_by(id, month) %>%
-  filter(month == 1 | month == 7) %>%
-  summarize (mean_tmax = mean(tmax), na.rm = TRUE) %>%
-  ggplot(aes(x=id, y = mean_tmax)) +
+  group_by(id, year, month) %>%
+  filter(month == 1 || month == 7, na.rm = TRUE) %>%
+  summarize (mean_tmax = mean(tmax)) %>%
+  ggplot(aes(x=year, y = mean_tmax, group = id)) +
     geom_point(alpha = .5) +
     facet_grid(
       .~month, 
       labeller = labeller(month = months.labs)) +
     labs(
       title = "NY average max temperatures in January and July",
-      x = "Weather Station ID",
+      x = "Year",
       y = "Mean max temp (C)",
       caption = "Data from NOAA (1981-2010) "
-    ) 
+    ) +
+    theme(panel.spacing = unit(2, "lines"))
 
 ```
-In terms of observable structure, average max temperatures are high in July (hovering around 30 degrees Celsius), and low in January (around 0 degrees Celsius). Also, it appears only half the weather stations report maximum temperature values for these months, and half do not have any data. There are no apparent outliers.
+In terms of observable structure, average max temperatures are high in July (hovering around 20-30 degrees Celsius), and low in January (around 0 degrees Celsius) across the entire time period. There are no significant trends in max temperature change over time. However, there are a few outliers: in January, very low temperatures at a station in 1982, and in July, a very low max temperature in 1988. 
 
 ###Two-panel plot of tmax vs tmin for full dataset
+
+```{r}
+  tmax_tmin_p = noaa_df %>%
+  ggplot(aes(x = tmin, y = tmax)) +
+    geom_hex() +
+    labs (
+      title = "Max Temp by Min Temp",
+      x = "Minimum Temperature (C)",
+      y = "Maxmimum Temperature (C)",
+      caption = "Data from NOAA (1981-2010)"
+    ) +
+    theme(legend.position = "right")
+```
 
 
 ###Distribution of snowfall values > 0 and <100 by year 
 
+```{r}
+
+snow_year_p =
+  noaa_df %>%
+  filter(snow > 0 & snow < 100, na.rm = TRUE) %>%
+  group_by(year) %>%
+  ggplot(aes(x=snow, y = year, group = year)) +
+    geom_density_ridges() +
+    labs (
+      title = "Distribution of Snowfall",
+      x = "Snowfall (mm)",
+      y = "Year",
+      caption = "Data from NOAA"
+    )
+```
+
+###Create final plot
+
+```{r}
+tmax_tmin_p + snow_year_p
 ```
 
