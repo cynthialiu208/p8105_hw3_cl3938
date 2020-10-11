@@ -88,7 +88,7 @@ instacart %>%
 		values_from = mean_hour
 	)
 ```
-#Question 2
+##Question 2
 
 ###Load, tidy, and wrangle data
 ``` {r}
@@ -125,20 +125,27 @@ The activity data doesn't show any apparent trends, however, it is interesting t
 accel %>%
   ggplot(aes(x = minute, y = activity, color = day)) +
   geom_line() +
+  scale_x_continuous(
+    breaks = c(0, 240, 480, 720, 960, 1200, 1440),
+    labels = c("Midnight", "4 AM", "8 AM", "Noon", "4 PM", "8 PM", "11:59 PM")
+  ) +
   labs(
-    title = "Accelerometer Activity over Time",
-    x = "Minute of the Day",
+    title = "24-Hour Accelerometer Activity by Day of Week",
+    x = "Time of day (hour)",
     y = "Activity"
   )
 ```
+The plot of 24-hour activity by day of the week shows overall trends. Without looking at day of the week, the patient is less active from 11 PM - 6 AM, likely due to sleep. During the other time periods, he is on average more active, with particular spikes in activity between 6-8 AM and again from 10 AM- 1 PM, and 7-10 PM. Looking further at day of the week, the patient seems to be particularly active in the morning on Sundays (perhaps due to running errands), and at night on Fridays (perhaps due to social activities).
 
-#Question 3
+##Question 3
 
 ```{r}
 data("ny_noaa")
 ```
 
-This dataset is NOAA data 
+This dataset contains `r nrow(ny_noaa)` observations and `r ncol(ny_noaa)` variables, including `r names(ny_noaa)'. The data contains historical information on weather in NY state from 1981-2010, including information on precipitation (in tenths of mm), snowfall (in mm), and temperatures extremes (in tenths of a degree Celsius), broken down by date (year/month/day). 
+
+There is significant missing data as each weather station can only collect information on a subset of these variables on any given day. Missing data may be an issue because they can lead to an incomplete pictures of the dataset, and if there are confounding variables that are contributing to missing data, we may have an incomplete picture of data trends.
 
 ###Clean data
 
