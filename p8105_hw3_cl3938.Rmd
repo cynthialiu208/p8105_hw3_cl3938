@@ -25,9 +25,9 @@ scale_colour_discrete = scale_colour_viridis_d
 scale_fill_discrete = scale_fill_viridis_d
 ```
 
-##Problem 1
+## Problem 1
 
-###Load the data
+### Load the data
 
 ```{r}
 data("instacart")
@@ -88,9 +88,9 @@ instacart %>%
 		values_from = mean_hour
 	)
 ```
-##Question 2
+## Question 2
 
-###Load, tidy, and wrangle data
+### Load, tidy, and wrangle data
 ``` {r}
 accel = 
   read_csv("./data/accel_data.csv") %>%
@@ -109,7 +109,7 @@ This dataset contains `r nrow(accel)` observations and `r ncol(accel)` variables
 
 Observations are at the level of daily activity of the patient, with data organized per minute of the day. There is information on the week, as well as on the day (ID of the day, day of the week, weekend vs weekday), and the remaining columns are for activity by the minute, numbered by the chronological order of minutes. 
 
-###Generate daily activity table
+### Generate daily activity table
 
 ``` {r}
 accel %>% 
@@ -119,7 +119,7 @@ accel %>%
 ```
 The activity data doesn't show any apparent trends, however, it is interesting to note that the patient had little to no activity during the last two Saturdays of this dataset, either due to a technology malfunction or just lower weekend movement.
 
-###Create accelerometer plot
+### Create accelerometer plot
 
 ```{r}
 accel %>%
@@ -137,7 +137,7 @@ accel %>%
 ```
 The plot of 24-hour activity by day of the week shows overall trends. Without looking at day of the week, the patient is less active from 11 PM - 6 AM, likely due to sleep. During the other time periods, he is on average more active, with particular spikes in activity between 6-8 AM and again from 10 AM- 1 PM, and 7-10 PM. Looking further at day of the week, the patient seems to be particularly active in the morning on Sundays (perhaps due to running errands), and at night on Fridays (perhaps due to social activities).
 
-##Question 3
+## Question 3
 
 ```{r}
 data("ny_noaa")
@@ -147,7 +147,7 @@ This dataset contains `r nrow(ny_noaa)` observations and `r ncol(ny_noaa)` varia
 
 There is significant missing data as each weather station can only collect information on a subset of these variables on any given day. Missing data may be an issue because they can lead to an incomplete pictures of the dataset, and if there are confounding variables that are contributing to missing data, we may have an incomplete picture of data trends.
 
-###Clean data
+### Clean data
 
 ``` {r}
 noaa_df <- ny_noaa %>%
@@ -168,7 +168,7 @@ noaa_df %>%
 ```
 The most commonly observed values for snowfall are 0 and NA, which make sense. The 0 value makes sense because not every location snows every winter, and snow only occurs every once in a while. The NA value also makes sense - due to the nature of the data, some locations only record a subset of variables, and it's possible locations are not recording snow or that they are not recording it during certain times of the year, like summer.
 
-###Two-panel plot of average max temperatures
+### Two-panel plot of average max temperatures
 
 ``` {r}
 months.labs <- c("January", "July")
@@ -194,7 +194,7 @@ noaa_df %>%
 ```
 In terms of observable structure, average max temperatures are high in July (hovering around 20-30 degrees Celsius), and low in January (around 0 degrees Celsius) across the entire time period. There are no significant trends in max temperature change over time. However, there are a few outliers: in January, very low temperatures at a station in 1982, and in July, a very low max temperature in 1988. 
 
-###Two-panel plot of tmax vs tmin for full dataset
+### Two-panel plot of tmax vs tmin for full dataset
 
 ```{r}
   tmax_tmin_p = noaa_df %>%
@@ -210,7 +210,7 @@ In terms of observable structure, average max temperatures are high in July (hov
 ```
 
 
-###Distribution of snowfall values > 0 and <100 by year 
+### Distribution of snowfall values > 0 and <100 by year 
 
 ```{r}
 
@@ -228,7 +228,7 @@ snow_year_p =
     )
 ```
 
-###Create final plot
+### Create final plot
 
 ```{r}
 tmax_tmin_p + snow_year_p
