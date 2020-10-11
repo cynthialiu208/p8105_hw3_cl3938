@@ -100,6 +100,7 @@ accel =
     minute = as.numeric(minute),
     day = as.factor(day),
     activity = as.numeric(activity),
+    day = forcats::fct_relevel(day, c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")),
     day_type = ifelse(day %in% c("Saturday", "Sunday"), "Weekend", "Weekday" )) %>%
   relocate(day_type, .after = day)
 ```
@@ -115,6 +116,20 @@ accel %>%
   group_by(week, day_id, day) %>%
   summarize(total_activity = sum(activity)) %>%
 	knitr::kable(caption = 'Total Activity per Day')
+```
+The activity data doesn't show any apparent trends, however, it is interesting to note that the patient had little to no activity during the last two Saturdays of this dataset, either due to a technology malfunction or just lower weekend movement.
+
+###Create accelerometer plot
+
+```{r}
+accel %>%
+  ggplot(aes(x = minute, y = activity, color = day)) +
+  geom_line() +
+  labs(
+    title = "Accelerometer Activity over Time",
+    x = "Minute of the Day",
+    y = "Activity"
+  )
 ```
 
 #Question 3
